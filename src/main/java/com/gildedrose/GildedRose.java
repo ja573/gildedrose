@@ -9,54 +9,129 @@ class GildedRose {
 
     public void updateQuality() {
         for (final Item item : items) {
-            if (!item.name.equals("Aged Brie")
-                && !item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-                if (item.quality > 0) {
-                    if (!item.name.equals("Sulfuras, Hand of Ragnaros")) {
-                        item.quality = item.quality - 1;
+            final CustomItem customItem = new CustomItem(item);
+            customItem.updateItemQuality();
+        }
+    }
+
+    class CustomItem {
+        protected Item item;
+
+        public CustomItem(final Item item) {
+            this.item = item;
+        }
+
+        public boolean isExpired() {
+            return item.sellIn < 0;
+        }
+
+        public boolean isQualityLessThan50() {
+            return item.quality < 50;
+        }
+
+        public boolean isItemEdible() {
+            return item.quality > 0;
+        }
+
+        public void incrementQualityByOne() {
+            this.changeQuality(1);
+        }
+
+        public void decrementQualityByOne() {
+            this.changeQuality(-1);
+        }
+
+        public void makeItemStale() {
+            this.item.quality = 0;
+        }
+
+        public void decrementSellInByOne() {
+            item.sellIn = item.sellIn - 1;
+        }
+
+        public boolean isSellInLessThanEleven() {
+            return item.sellIn < 11;
+        }
+
+        private void changeQuality(final int changeBy) {
+            item.quality = item.quality + changeBy;
+        }
+
+        public void updateItemQuality() {
+            if (item.name.equals("Aged Brie") && this.isQualityLessThan50()) {
+                this.incrementQualityByOne();
+            } else if ((item.name.equals("Backstage passes to a TAFKAL80ETC concert"))) {
+                if (this.isQualityLessThan50()) {
+                    this.incrementQualityByOne();
+
+                    if (this.isQualityLessThan50() && this.isSellInLessThanEleven()) {
+                        this.incrementQualityByOne();
                     }
                 }
-            } else {
-                if (item.quality < 50) {
-                    item.quality = item.quality + 1;
-
-                    if (item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-                        if (item.sellIn < 11) {
-                            if (item.quality < 50) {
-                                item.quality = item.quality + 1;
-                            }
-                        }
-
-                        if (item.sellIn < 6) {
-                            if (item.quality < 50) {
-                                item.quality = item.quality + 1;
-                            }
-                        }
-                    }
-                }
+            } else if (this.isItemEdible() && !item.name.equals("Sulfuras, Hand of Ragnaros")) {
+                this.decrementQualityByOne();
             }
 
             if (!item.name.equals("Sulfuras, Hand of Ragnaros")) {
-                item.sellIn = item.sellIn - 1;
+                this.decrementSellInByOne();
             }
 
-            if (item.sellIn < 0) {
-                if (!item.name.equals("Aged Brie")) {
-                    if (!item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-                        if (item.quality > 0) {
-                            if (!item.name.equals("Sulfuras, Hand of Ragnaros")) {
-                                item.quality = item.quality - 1;
-                            }
-                        }
-                    } else {
-                        item.quality = 0;
-                    }
-                } else {
-                    if (item.quality < 50) {
-                        item.quality = item.quality + 1;
-                    }
+            if (this.isExpired()) {
+                if (item.name.equals("Aged Brie") && this.isQualityLessThan50()) {
+                    this.incrementQualityByOne();
+                } else if (item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
+                    this.makeItemStale();
+                } else if (this.isItemEdible() && !item.name.equals("Sulfuras, Hand of Ragnaros")) {
+                    this.decrementQualityByOne();
                 }
             }
+        }
+    }
+
+    class AgedBrie extends CustomItem {
+
+        public AgedBrie(final Item item) {
+            super(item);
+        }
+
+        public void updateItemQuality() {
+            if (this.isQualityLessThan50()) {
+                this.incrementQualityByOne();
+            }
+
+            this.decrementSellInByOne();
+
+            if (this.isExpired() && this.isQualityLessThan50()) {
+                this.incrementQualityByOne();
+            }
+
+//            if (item.name.equals("Aged Brie") && this.isQualityLessThan50()) {
+//                this.incrementQualityByOne();
+//            } else if ((item.name.equals("Backstage passes to a TAFKAL80ETC concert"))) {
+//                if (this.isQualityLessThan50()) {
+//                    this.incrementQualityByOne();
+//
+//                    if (this.isQualityLessThan50() && this.isSellInLessThanEleven()) {
+//                        this.incrementQualityByOne();
+//                    }
+//                }
+//            } else if (this.isItemEdible() && !item.name.equals("Sulfuras, Hand of Ragnaros")) {
+//                this.decrementQualityByOne();
+//            }
+//
+//            if (!item.name.equals("Sulfuras, Hand of Ragnaros")) {
+//                this.decrementSellInByOne();
+//            }
+//
+//            if (this.isExpired()) {
+//                if (item.name.equals("Aged Brie") && this.isQualityLessThan50()) {
+//                    this.incrementQualityByOne();
+//                } else if (item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
+//                    this.makeItemStale();
+//                } else if (this.isItemEdible() && !item.name.equals("Sulfuras, Hand of Ragnaros")) {
+//                    this.decrementQualityByOne();
+//                }
+//            }
         }
     }
 }
